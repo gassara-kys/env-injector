@@ -1,22 +1,37 @@
+# source: https://goreleaser.com/customization/
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
+      - linux
       - windows
       - darwin
-      - linux
-    goarch:
-      - amd64
-      - 386
-    ignore:
-      - goos: darwin
-        goarch: 386
-archive:
-  format: tar.gz
-  files:
-    - README.md
-    - LICENSE
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    files:
+      - README.md
+      - LICENSE
+    format_overrides:
+      - goos: windows
+        format: zip
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
 release:
   github:
-    owner: okzk
+    owner: gassara-kys
     name: env-injector
